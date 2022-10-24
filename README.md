@@ -20,7 +20,7 @@ $ yarn install
 Compile the smart contracts with Hardhat:
 
 ```
-$ npx hardhat compile
+$ yarn compile
 ```
 
 
@@ -46,7 +46,7 @@ Execute the tasks in the following order with correct params to deploy unipilot 
 
 To run the test cases:
 ```
-$ npx hardhat test
+$ yarn test
 ```
 
 ## Security
