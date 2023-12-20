@@ -3,15 +3,15 @@ import { parseUnits } from "ethers/lib/utils";
 import { stakingConfigFixture } from "../shared/fixtures";
 import { MaxUint256 } from "@ethersproject/constants";
 import { ethers, waffle } from "hardhat";
-import { UnipilotStaking } from "../../typechain/UnipilotStaking";
+import { A51Staking } from "../../typechain/A51Staking";
 import { TestERC20 } from "../../typechain/TestERC20";
 import { mineNBlocks, TX_TYPE, expectEventForAll } from "../common.setup";
 
 const createFixtureLoader = waffle.createFixtureLoader;
 
 export async function shouldBehaveLikeStake(): Promise<void> {
-  let staking: UnipilotStaking;
-  let pilot: TestERC20;
+  let staking: A51Staking;
+  let a51: TestERC20;
   let WETH: TestERC20;
   let testToken: TestERC20;
   let ONE = parseUnits("1", "18");
@@ -29,28 +29,28 @@ export async function shouldBehaveLikeStake(): Promise<void> {
   beforeEach("fixtures", async () => {
     const res = await loadFixture(stakingConfigFixture);
     staking = res.staking;
-    pilot = res.pilot;
+    a51 = res.a51;
     WETH = res.WETH;
     testToken = res.testToken;
 
     let HundredWETH = parseUnits("100", "18");
 
-    await pilot.connect(wallet).mint(wallet.address, parseUnits("2000000", "18"));
+    await a51.connect(wallet).mint(wallet.address, parseUnits("2000000", "18"));
     await WETH.connect(wallet).mint(wallet.address, parseUnits("2000000", "18"));
 
     await WETH.transfer(staking.address, HundredWETH);
     await staking.updateRewards(HUNDRED, "3000");
 
-    await pilot.connect(wallet).approve(staking.address, MaxUint256);
+    await a51.connect(wallet).approve(staking.address, MaxUint256);
     await WETH.connect(wallet).approve(staking.address, MaxUint256);
 
-    await pilot.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
-    await pilot.connect(bob).mint(bob.address, parseUnits("2000000", "18"));
-    await pilot.connect(carol).mint(carol.address, parseUnits("2000000", "18"));
+    await a51.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
+    await a51.connect(bob).mint(bob.address, parseUnits("2000000", "18"));
+    await a51.connect(carol).mint(carol.address, parseUnits("2000000", "18"));
 
-    await pilot.connect(alice).approve(staking.address, MaxUint256);
-    await pilot.connect(bob).approve(staking.address, MaxUint256);
-    await pilot.connect(carol).approve(staking.address, MaxUint256);
+    await a51.connect(alice).approve(staking.address, MaxUint256);
+    await a51.connect(bob).approve(staking.address, MaxUint256);
+    await a51.connect(carol).approve(staking.address, MaxUint256);
   });
 
   describe("#Stake", () => {
@@ -69,7 +69,7 @@ export async function shouldBehaveLikeStake(): Promise<void> {
       //get rewardPerBlock
       expect(await staking.currentRewardPerBlock()).to.equal(HundredWETH.div(3000));
 
-      //stake 50 pilot from alice
+      //stake 50 a51 from alice
       await staking.stake(alice.address, HundredWETH);
       await mineNBlocks(10);
 
@@ -152,9 +152,9 @@ export async function shouldBehaveLikeStake(): Promise<void> {
       // pendingRewards is not equal to user balance because hardhat not including both txs in single block
       expect(user1PendingRewards.add("200000000000000000")).to.be.eq(user1BalanceAfter.sub(user1BalanceBefore));
       expect(await staking.currentRewardPerBlock()).to.be.eq(parseUnits("1", "18"));
-      expect(await staking.totalPilotStaked()).to.be.eq(parseUnits("500", "18"));
+      expect(await staking.totalA51Staked()).to.be.eq(parseUnits("500", "18"));
       expect(await staking.rewardToken()).to.be.eq(WETH.address);
-      expect(await staking.pilotToken()).to.be.eq(pilot.address);
+      expect(await staking.a51Token()).to.be.eq(a51.address);
 
       blocksPassed = 10;
       mineNBlocks(blocksPassed);

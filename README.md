@@ -1,9 +1,10 @@
-# Unipilot Staking
+# A51 Staking
 
-This repository contains Unipilot staking smart contract.
+This repository contains A51 staking smart contract.
 
-## UnipilotStaking.sol
-`UnipilotStaking.sol` allows unipilot holders to stake (`stake()`) unipilot tokens to receive rewards (reward token could be WETH or any other ERC-20 token). Staker can claim rewards (`claim()`). Stakers may unstake their unipilot tokens by calling `unstake()`, which will trigger the reward claim as well. For emergency unstake, stakers can call `emergencyUnstake()`, beaware that emergency unstake doesn't trigger reward claim and all your pending reward tokens are lost.
+## A51Staking.sol
+
+`A51Staking.sol` allows a51 holders to stake (`stake()`) a51 tokens to receive rewards (reward token could be WETH or any other ERC-20 token). Staker can claim rewards (`claim()`). Stakers may unstake their a51 tokens by calling `unstake()`, which will trigger the reward claim as well. For emergency unstake, stakers can call `emergencyUnstake()`, beaware that emergency unstake doesn't trigger reward claim and all your pending reward tokens are lost.
 
 ## Local deployment
 
@@ -23,7 +24,6 @@ Compile the smart contracts with Hardhat:
 $ yarn compile
 ```
 
-
 Set the environment variables.
 For example:
 
@@ -33,27 +33,23 @@ PK1="Your private key"
 ETHERSCAN_API_KEY="Your etherscan API key"
 ```
 
-Execute the tasks in the following order with correct params to deploy unipilot staking contract and to verify it.
+Execute the tasks in the following order with correct params to deploy a51 staking contract and to verify it.
 
 ```
-1. deploy-unipilot-setup
-2. deploy-unipilot-staking
+1. deploy-a51-setup
+2. deploy-a51-staking
 3. setup-staking-contract
-4. verify-unipilot-staking
+4. verify-a51-staking
 ```
 
 ## Test cases
 
 To run the test cases:
+
 ```
 $ yarn test
 ```
 
-## Security
-
-Audit was performed by [Block Apex](https://blockapex.io/unipilot-staking-audit-report/)
-
 ## Licensing
 
-Unipilot staking contract is licensed under the [MIT License](https://opensource.org/licenses/MIT)
-
+A51 staking contract is licensed under the [MIT License](https://opensource.org/licenses/MIT)

@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import { ContractTransaction, Wallet } from "ethers";
 import { expect } from "chai";
-import { UnipilotStaking } from "../typechain/UnipilotStaking.d";
+import { A51Staking } from "../typechain/A51Staking.d";
 import { BigNumber } from "ethers";
 import { loadFixture } from "ethereum-waffle";
 import { stakingConfigFixture } from "./shared/fixtures";
@@ -27,7 +27,7 @@ export const mineNBlocks = async (n: number): Promise<number> => {
   // console.log("currentBlockNumber: ", currentBlockNumber);
 };
 export const expectStake = (
-  staking: UnipilotStaking,
+  staking: A51Staking,
   variable: ContractTransaction,
   user: Wallet,
   amount: string | BigNumber | number,
@@ -35,14 +35,14 @@ export const expectStake = (
 ) => expect(variable).to.emit(staking, "Stake").withArgs(user.address, amount, pendingRewards);
 
 export const expectClaim = (
-  staking: UnipilotStaking,
+  staking: A51Staking,
   variable: ContractTransaction,
   user: Wallet,
   pendingRewards: string | BigNumber | number,
 ) => expect(variable).to.emit(staking, "Claim").withArgs(user.address, pendingRewards);
 
 export const expectUnstake = (
-  staking: UnipilotStaking,
+  staking: A51Staking,
   variable: ContractTransaction,
   user: Wallet,
   amount: string | BigNumber | number,
@@ -51,7 +51,7 @@ export const expectUnstake = (
 ) => expect(variable).to.emit(staking, "Unstake").withArgs(user.address, amount, pendingRewards, isEmergency);
 
 export const expectEventForAll = (
-  staking: UnipilotStaking,
+  staking: A51Staking,
   variable: ContractTransaction | Promise<ContractTransaction>,
   user: Wallet,
   amount: string | BigNumber | number,

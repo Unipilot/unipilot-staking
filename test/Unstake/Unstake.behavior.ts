@@ -3,7 +3,7 @@ import { parseUnits } from "ethers/lib/utils";
 import { stakingConfigFixture } from "../shared/fixtures";
 import { MaxUint256 } from "@ethersproject/constants";
 import { ethers, waffle } from "hardhat";
-import { UnipilotStaking } from "../../typechain/UnipilotStaking";
+import { A51Staking } from "../../typechain/A51Staking";
 import { TestERC20 } from "../../typechain/TestERC20.d";
 import { mineNBlocks, expectEventForAll, TX_TYPE } from "./../common.setup";
 import { BigNumber } from "ethers";
@@ -11,8 +11,8 @@ import { BigNumber } from "ethers";
 const createFixtureLoader = waffle.createFixtureLoader;
 
 export async function shouldBehaveLikeUnstake(): Promise<void> {
-  let staking: UnipilotStaking;
-  let pilot: TestERC20;
+  let staking: A51Staking;
+  let a51: TestERC20;
   let WETH: TestERC20;
 
   let ONE = parseUnits("1", "18");
@@ -27,22 +27,22 @@ export async function shouldBehaveLikeUnstake(): Promise<void> {
     loadFixture = createFixtureLoader([wallet]);
     const res = await loadFixture(stakingConfigFixture);
     staking = res.staking;
-    pilot = res.pilot;
+    a51 = res.a51;
     WETH = res.WETH;
 
-    await pilot.mint(wallet.address, parseUnits("2000000", "18"));
+    await a51.mint(wallet.address, parseUnits("2000000", "18"));
     await WETH.mint(wallet.address, parseUnits("2000000", "18"));
 
-    await pilot.connect(wallet).approve(staking.address, MaxUint256);
+    await a51.connect(wallet).approve(staking.address, MaxUint256);
     await WETH.connect(wallet).approve(staking.address, MaxUint256);
 
-    await pilot.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
-    await pilot.connect(bob).mint(bob.address, parseUnits("2000000", "18"));
-    await pilot.connect(carol).mint(carol.address, parseUnits("2000000", "18"));
+    await a51.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
+    await a51.connect(bob).mint(bob.address, parseUnits("2000000", "18"));
+    await a51.connect(carol).mint(carol.address, parseUnits("2000000", "18"));
 
-    await pilot.connect(alice).approve(staking.address, MaxUint256);
-    await pilot.connect(bob).approve(staking.address, MaxUint256);
-    await pilot.connect(carol).approve(staking.address, MaxUint256);
+    await a51.connect(alice).approve(staking.address, MaxUint256);
+    await a51.connect(bob).approve(staking.address, MaxUint256);
+    await a51.connect(carol).approve(staking.address, MaxUint256);
   });
   beforeEach("fixtures", async () => {
     await WETH.transfer(staking.address, parseUnits("100", "18"));
@@ -127,14 +127,14 @@ export async function shouldBehaveLikeUnstake(): Promise<void> {
       expectEventForAll(staking, emergencyUnstake, alice, parseUnits("10", "18"), "0", TX_TYPE.EMERGENCY);
     });
 
-    it("should show correct balances of contract ($PILOT & $TOKEN) after unstaking", async () => {
+    it("should show correct balances of contract ($A51 & $TOKEN) after unstaking", async () => {
       //after this emergency unstake of wallet, rewards after this tx will be completely rewarded to alice
       //and all those rewards that are not claimed by wallet will be left unclaimed in the contract
       //and can be withdrawn by governance using migrateFunds.
       await staking.connect(wallet).emergencyUnstake();
 
       const HUNDRED = parseUnits("100", "18");
-      let contractPilotBalanceBefore = await pilot.balanceOf(staking.address);
+      let contractA51BalanceBefore = await a51.balanceOf(staking.address);
       let contractWETHBalanceBefore = await WETH.balanceOf(staking.address);
       // console.log("staking startttt")
       await staking.stake(alice.address, HUNDRED);
@@ -144,11 +144,11 @@ export async function shouldBehaveLikeUnstake(): Promise<void> {
       let expectedReward = BigNumber.from("6725477777777777600");
       expectEventForAll(staking, unstakeWithClaim, alice, HUNDRED, expectedReward, TX_TYPE.UNSTAKE);
 
-      let contractPilotBalanceAfter = await pilot.balanceOf(staking.address);
+      let contractA51BalanceAfter = await a51.balanceOf(staking.address);
       let contractWETHBalanceAfter = await WETH.balanceOf(staking.address);
 
       await expect(contractWETHBalanceBefore).to.equal(contractWETHBalanceAfter.add(expectedReward));
-      await expect(contractPilotBalanceBefore).to.equal(contractPilotBalanceAfter);
+      await expect(contractA51BalanceBefore).to.equal(contractA51BalanceAfter);
     });
   });
 }

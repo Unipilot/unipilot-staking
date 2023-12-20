@@ -3,15 +3,15 @@ import { parseUnits } from "ethers/lib/utils";
 import { stakingConfigFixture } from "../shared/fixtures";
 import { MaxUint256 } from "@ethersproject/constants";
 import { ethers, waffle } from "hardhat";
-import { UnipilotStaking } from "../../typechain/UnipilotStaking";
+import { A51Staking } from "../../typechain/A51Staking";
 import { TestERC20 } from "../../typechain/TestERC20";
 import { mineNBlocks, TX_TYPE, expectEventForAll } from "../common.setup";
 
 const createFixtureLoader = waffle.createFixtureLoader;
 
 export async function shouldBehaveLikeGovernance(): Promise<void> {
-  let staking: UnipilotStaking;
-  let pilot: TestERC20;
+  let staking: A51Staking;
+  let a51: TestERC20;
   let WETH: TestERC20;
   let HUNDRED = parseUnits("100", "18");
   let TEN = parseUnits("10", "18");
@@ -30,31 +30,31 @@ export async function shouldBehaveLikeGovernance(): Promise<void> {
   beforeEach("fixtures", async () => {
     const res = await loadFixture(stakingConfigFixture);
     staking = res.staking;
-    pilot = res.pilot;
+    a51 = res.a51;
     WETH = res.WETH;
 
-    await pilot.mint(wallet.address, parseUnits("2000000", "18"));
+    await a51.mint(wallet.address, parseUnits("2000000", "18"));
     await WETH.mint(wallet.address, parseUnits("2000000", "18"));
     await SECONDARY_TOKEN.mint(wallet.address, parseUnits("2000000", "18"));
 
     await WETH.transfer(staking.address, HUNDRED);
     await staking.updateRewards(HUNDRED, 100);
 
-    await pilot.connect(wallet).approve(staking.address, MaxUint256);
+    await a51.connect(wallet).approve(staking.address, MaxUint256);
     await WETH.connect(wallet).approve(staking.address, MaxUint256);
     await SECONDARY_TOKEN.connect(wallet).approve(staking.address, MaxUint256);
 
-    await pilot.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
-    await pilot.connect(bob).mint(bob.address, parseUnits("2000000", "18"));
-    await pilot.connect(carol).mint(carol.address, parseUnits("2000000", "18"));
+    await a51.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
+    await a51.connect(bob).mint(bob.address, parseUnits("2000000", "18"));
+    await a51.connect(carol).mint(carol.address, parseUnits("2000000", "18"));
 
-    await pilot.connect(alice).approve(staking.address, MaxUint256);
-    await pilot.connect(bob).approve(staking.address, MaxUint256);
-    await pilot.connect(carol).approve(staking.address, MaxUint256);
+    await a51.connect(alice).approve(staking.address, MaxUint256);
+    await a51.connect(bob).approve(staking.address, MaxUint256);
+    await a51.connect(carol).approve(staking.address, MaxUint256);
   });
   describe("#RewardAndGovernance", () => {
     xit("should return 1 eth", async () => {
-      const result = await staking.totalPilotStaked();
+      const result = await staking.totalA51Staked();
       expect(result).to.equal(ONE);
     });
 

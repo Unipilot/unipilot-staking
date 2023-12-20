@@ -3,7 +3,7 @@ import { parseUnits } from "ethers/lib/utils";
 import { stakingConfigFixture } from "../shared/fixtures";
 import { MaxUint256 } from "@ethersproject/constants";
 import { ethers, waffle } from "hardhat";
-import { UnipilotStaking } from "../../typechain/UnipilotStaking";
+import { A51Staking } from "../../typechain/A51Staking";
 import { TestERC20 } from "../../typechain/TestERC20";
 import { mineNBlocks, TX_TYPE, expectEventForAll } from "../common.setup";
 import { TestERC206D } from "../../typechain";
@@ -11,8 +11,8 @@ import { TestERC206D } from "../../typechain";
 const createFixtureLoader = waffle.createFixtureLoader;
 
 export async function shouldBehaveLikeDecimalInput(): Promise<void> {
-  let staking: UnipilotStaking;
-  let pilot: TestERC20;
+  let staking: A51Staking;
+  let a51: TestERC20;
   let WETH: TestERC20;
   let WETH6D: TestERC206D;
   let HUNDRED = parseUnits("100", "18");
@@ -29,22 +29,22 @@ export async function shouldBehaveLikeDecimalInput(): Promise<void> {
   beforeEach("fixtures", async () => {
     const res = await loadFixture(stakingConfigFixture);
     staking = res.staking;
-    pilot = res.pilot;
+    a51 = res.a51;
     WETH = res.WETH;
     WETH6D = res.WETH6D;
 
-    await pilot.mint(wallet.address, parseUnits("2000000", "18"));
+    await a51.mint(wallet.address, parseUnits("2000000", "18"));
     await WETH.mint(wallet.address, parseUnits("2000000", "18"));
     await WETH6D.mint(wallet.address, parseUnits("2000000", "18"));
 
     await WETH.transfer(staking.address, HUNDRED);
     await WETH6D.transfer(staking.address, HUNDRED);
 
-    await pilot.approve(staking.address, MaxUint256);
+    await a51.approve(staking.address, MaxUint256);
     await WETH.approve(staking.address, MaxUint256);
 
-    await pilot.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
-    await pilot.connect(alice).approve(staking.address, MaxUint256);
+    await a51.connect(alice).mint(alice.address, parseUnits("2000000", "18"));
+    await a51.connect(alice).approve(staking.address, MaxUint256);
   });
   describe("#RewardAndGovernance", () => {
     it("should monitor for wei input in 18 decimals token", async () => {
