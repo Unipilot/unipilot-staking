@@ -40,11 +40,12 @@ if (!infuraApiKey) {
 let alchemyapiKey = process.env.FORK;
 
 const etherscanApiKey = process.env.ETHERSCAN_API_KEY;
+const polyscanApiKey = process.env.POLYGONSCAN_API_KEY;
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string =
     network == "mumbai"
-      ? "https://speedy-nodes-nyc.moralis.io/127149d18dffd833851dc9f2/polygon/mumbai"
+      ? "https://polygon-testnet.public.blastapi.io"
       : "https://" + network + ".infura.io/v3/" + infuraApiKey;
   return {
     accounts: [`${process.env.PK1}`],
@@ -115,7 +116,7 @@ const config: HardhatUserConfig = {
     target: "ethers-v5",
   },
   etherscan: {
-    apiKey: etherscanApiKey,
+    apiKey: polyscanApiKey,
   },
 };
 
