@@ -9,6 +9,48 @@ import { task } from "hardhat/config";
 //STAKE TO: 0x1E3881227010c8DcDFa2F11833D3d70A00893f94
 //WETH: 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
 
+task("deploy-pilotToken-staking", "Deploy Pilot Staking Contract")
+  .addParam("governance", "governance address")
+  .addParam("reward", "reward token address")
+  .addParam("pilot", "pilot token address")
+  .setAction(async (cliArgs, { ethers, run, network }) => {
+    await run("compile");
+
+    const signer = (await ethers.getSigners())[0];
+    console.log("Signer");
+
+    console.log("  at", signer.address);
+    console.log("  ETH", formatEther(await signer.getBalance()));
+
+    const args = {
+      governance: cliArgs.governance,
+      rewardToken: cliArgs.reward,
+      pilotToken: cliArgs.pilot,
+    };
+
+    console.log("Network");
+    console.log("   ", network.name);
+    console.log("Task Args");
+    console.log(args);
+
+    const pilotStaking = await deployContract(
+      "UnipilotStaking",
+      await ethers.getContractFactory("UnipilotStaking"),
+      signer,
+      [args.governance, args.rewardToken, args.pilotToken],
+    );
+
+    await pilotStaking.deployTransaction.wait(5);
+    delay(60000);
+
+    console.log("Verifying Smart Contract ...");
+
+    await run("verify:verify", {
+      address: pilotStaking.address,
+      constructorArguments: [args.governance, args.rewardToken, args.pilotToken],
+    });
+  });
+
 task("deploy-unipilot-setup", "Deploy Unipilot Staking Setup Contract")
   .addParam("pilot", "pilot token address")
   .setAction(async (cliArgs, { ethers, run, network }) => {
@@ -33,7 +75,7 @@ task("deploy-unipilot-setup", "Deploy Unipilot Staking Setup Contract")
       "UnipilotStakingSetup",
       await ethers.getContractFactory("UnipilotStakingSetup"),
       signer,
-      [args.pilotToken]
+      [args.pilotToken],
     );
 
     await unipilotStakingSetup.deployTransaction.wait(5);
@@ -75,7 +117,7 @@ task("deploy-unipilot-staking", "Deploy Unipilot Staking Contract")
       "UnipilotStaking",
       await ethers.getContractFactory("UnipilotStaking"),
       signer,
-      [args.governance, args.rewardToken, args.pilotToken]
+      [args.governance, args.rewardToken, args.pilotToken],
     );
 
     await unipilotStaking.deployTransaction.wait(5);
@@ -85,11 +127,7 @@ task("deploy-unipilot-staking", "Deploy Unipilot Staking Contract")
 
     await run("verify:verify", {
       address: unipilotStaking.address,
-      constructorArguments: [
-        args.governance,
-        args.rewardToken,
-        args.pilotToken,
-      ],
+      constructorArguments: [args.governance, args.rewardToken, args.pilotToken],
     });
   });
 
@@ -112,11 +150,7 @@ task("setup-staking-contract", "Setup unipilot staking contract")
     console.log("Task Args");
     console.log(cliArgs);
 
-    let stakingSetup = await ethers.getContractAt(
-      "UnipilotStakingSetup",
-      setupContract,
-      signer
-    );
+    let stakingSetup = await ethers.getContractAt("UnipilotStakingSetup", setupContract, signer);
 
     let tx1 = await stakingSetup.setStakingAddress(stakingContract);
     let receipt1 = await tx1.wait();
@@ -127,7 +161,7 @@ task("setup-staking-contract", "Setup unipilot staking contract")
       cliArgs.governance,
       stakeAmount,
       cliArgs.reward,
-      cliArgs.distributionBlocks
+      cliArgs.distributionBlocks,
     );
     let receipt2 = await tx2.wait();
     console.log("Setup tx ", receipt2);
@@ -149,5 +183,5 @@ task("setup-staking-contract", "Setup unipilot staking contract")
 // );
 
 function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

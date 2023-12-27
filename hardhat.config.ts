@@ -10,10 +10,7 @@ import { resolve } from "path";
 
 import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
-import {
-  HardhatNetworkAccountUserConfig,
-  NetworkUserConfig,
-} from "hardhat/types";
+import { HardhatNetworkAccountUserConfig, NetworkUserConfig } from "hardhat/types";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
@@ -44,15 +41,13 @@ let alchemyapiKey = process.env.FORK;
 
 const etherscanApiKey = process.env.ETHERSCAN_API_KEY;
 
-function createTestnetConfig(
-  network: keyof typeof chainIds
-): NetworkUserConfig {
+function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string =
     network == "mumbai"
       ? "https://speedy-nodes-nyc.moralis.io/127149d18dffd833851dc9f2/polygon/mumbai"
       : "https://" + network + ".infura.io/v3/" + infuraApiKey;
   return {
-    accounts: [`${process.env.PK1}`, `${process.env.PK2}`],
+    accounts: [`${process.env.PK1}`],
     chainId: chainIds[network],
     url,
     gas: 2100000,
